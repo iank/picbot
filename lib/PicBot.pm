@@ -4,7 +4,9 @@ use warnings;
 
 use Robit;
 use PicBot::DB;
+use PicBot::Twitter;
 use LWP::UserAgent::POE;
+use Data::Dumper;
 
 use feature ':5.10';
 
@@ -37,6 +39,7 @@ sub spawn {
 
     $r->add_handler('addressed', \&stats);
     $r->add_handler('addressed', \&whosaid);
+    $r->add_handler('addressed', \&vote);
     $r->add_handler('addressed', \&img); # catchall, must be last
     $r->spawn();
 }
@@ -105,6 +108,36 @@ sub capture_img {
             $db->insert($who,$url,$where,$robit->server);
             return 1;
         }
+    }
+}
+
+sub vote {
+    my ($robit, $what, $chan, $said) = @_;
+    my $db = $robit->heap->{db};
+    my $last = $robit->heap->{last};
+
+    #original loudbot code had sagelast also, we don't have that here, yet
+    if ($what =~ /^twitlast/i) {
+        my $reply = 'no.';
+        my $action = lc $1;
+
+        return if $chan !~ /#/;
+
+        if (exists $last->{$chan}->{url}) {
+                print time, "vote: tweet\n" . Dumper($last->{$chan}) . "\n";
+                my $id = PicBot::Twitter::tweet($last->{$chan}->{url});
+                $reply = defined $id
+                            ? "http://twitter.com/ikspicbot/status/$id"
+                            : "Could not twatter.  It's probably broken.";
+
+                $reply .= ' (' . $last->{$chan}->{said}  . '/'
+                       . $last->{$chan}->{channel} . ')';
+                delete $last->{$chan}->{url};
+        }
+
+        $robit->irc->yield(privmsg => $chan => "$said: $reply") if $reply;
+
+        return 1; # handled
     }
 }
 
