@@ -33,6 +33,7 @@ sub spawn {
 
     $r->add_handler('public', \&capture_img);
     $r->add_handler('action', \&capture_img);
+    $r->add_handler('addressed', \&capture_img);
 
     $r->add_handler('addressed', \&source);
     $r->add_handler('addressed', \&fail);
@@ -106,7 +107,7 @@ sub capture_img {
         if ($r->is_success) {
             print "$url\n";
             $db->insert($who,$url,$where,$robit->server);
-            return 1;
+            return 0; # this is passive and should fall through
         }
     }
 }
@@ -127,7 +128,7 @@ sub vote {
                 print time, "vote: tweet\n" . Dumper($last->{$chan}) . "\n";
                 my $id = PicBot::Twitter::tweet($last->{$chan}->{url});
                 $reply = defined $id
-                            ? "http://twitter.com/ikspicbot/status/$id"
+                            ? "http://twitter.com/snausagebringer/status/$id"
                             : "Could not twatter.  It's probably broken.";
 
                 $reply .= ' (' . $last->{$chan}->{said}  . '/'
