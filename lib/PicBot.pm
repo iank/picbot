@@ -79,14 +79,16 @@ sub source {
     my ($robit,$what,$where,$who) = @_;
     if ($what =~ /^source/) {
         $robit->irc->yield(privmsg => $where => "http://github.com/iank/picbot");
-        return 1;
-    }
+    } elsif ($what =~ /^help/) {
+        $robit->irc->yield(privmsg => $where => "Tell me about an image URL to add it. sage deletes the last image said in-channel. GO BOLDLY BEFORE THE THRONE OF LULZ");
+    } else { return 0 }
+    return 1;
 }
 
 sub fail {
     my ($robit,$what,$where,$who) = @_;
     my $last = $robit->heap->{last};
-    if ($what =~ /404/) {
+    if ($what =~ /sage|404/) {
         if (exists $last->{$where}) {
             $robit->heap->{db}->fail($last->{$where}->{id});
             delete $last->{$where};
