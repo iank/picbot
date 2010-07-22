@@ -9,7 +9,7 @@ use PicBot; # frijole made me do it
 given ($ARGV[0]) {
     when ('freenode') {
         PicBot::spawn('picbot', 'irc.freenode.net',
-                      '##turtles', '#peltkore');
+                      '##turtles', '#peltkore', '#perl-cats');
     }
     when ('slashnet') {
         PicBot::spawn('ikki', 'irc.slashnet.org', '#mefi');

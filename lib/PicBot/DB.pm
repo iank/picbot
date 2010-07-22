@@ -45,8 +45,7 @@ sub fail {
     my ($self, $id) = @_;
 
     my $pic = $self->pdb->find($id);
-    $pic->fails($pic->fails + 1) if defined $pic;
-    $pic->update();
+    $pic->delete if defined $pic;
 }
 
 sub fetchrand {
