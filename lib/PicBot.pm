@@ -109,6 +109,12 @@ sub capture_img {
         if ($r->is_success) {
             print "$url\n";
             $db->insert($who,$url,$where,$robit->server);
+
+            my $last = $robit->heap->{last};
+            $last->{$where} = $robit->heap->{db}->fetchrand();
+            # Quit your whining: if there's no data, crashing is like a feature
+            $robit->irc->yield(privmsg => $where => $last->{$where}->{url});
+
             return 0; # this is passive and should fall through
         }
     }
