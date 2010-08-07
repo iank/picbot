@@ -115,7 +115,7 @@ sub capture_img {
             # Quit your whining: if there's no data, crashing is like a feature
             $robit->irc->yield(privmsg => $where => $last->{$where}->{url});
 
-            return 0; # this is passive and should fall through
+            return 1; # this is passive and should fall through
         }
     }
 }
