@@ -2,15 +2,19 @@ package PicBot::Twitter;
 use strict;
 use warnings;
 
-use Net::Twitter;
+use Net::Twitter::OAuth;
 
 # FIXME: expedite the repo migration at the expense of ugliness
-our $USER;
-our $PASS;
+our ($KEY,$SECRET);
+our ($TOKEN,$TSECRET);
 
 sub tweet {
     my ($tw) = @_;
-    my $twit = Net::Twitter->new({username=>"ikspicbot", password=>"onetwothreefourfivesix", useragent_class => 'LWP::UserAgent::POE'});
+
+    my $twit = Net::Twitter::OAuth->new(consumer_key=>$KEY, consumer_secret=>$SECRET);
+    $twit->access_token($TOKEN);
+    $twit->access_token_secret($TSECRET);
+
     return eval {
         chomp(my $id = $twit->update($tw)->{id});
         return $id;
