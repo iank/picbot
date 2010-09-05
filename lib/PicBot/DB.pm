@@ -81,8 +81,18 @@ sub fail {
 }
 
 sub searchtags {
-    my ($self) = @_;
-    my $p = $self->
+    my ($self, $tag) = @_;
+    my $pics = $self->pdb->search(
+      {
+        'tags.tag' => {LIKE => "%$tag%"},
+      },
+      {
+        join => 'tags', # join the tags table
+      }
+    );
+    
+    my $p = $pics->slice(int rand $pics->count)->first();
+    
     return { id => $p->pid, url => $p->url,
              said => $p->said, channel => $p->channel,
              network => $p->network };

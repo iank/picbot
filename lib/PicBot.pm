@@ -41,6 +41,7 @@ sub spawn {
     $r->add_handler('addressed', \&stats);
     $r->add_handler('addressed', \&addtag);
     $r->add_handler('addressed', \&showtags);
+    $r->add_handler('addressed', \&searchtags);
     $r->add_handler('addressed', \&whosaid);
     $r->add_handler('addressed', \&vote);
     $r->add_handler('addressed', \&img); # catchall, must be last
@@ -90,8 +91,15 @@ sub showtags {
 sub searchtags {
 	my ($robit,$what,$where,$who) = @_;
 	
-	if ($what =~ /^(?:last)?tags/) {
+	if ($what =~ /^search\s+(\S+)/) {
+        my $last = $robit->heap->{last};
+        $last->{$where} = $robit->heap->{db}->searchtags($1);
+        # Quit your whining: if there's no data, crashing is like a feature
+        $robit->irc->yield(privmsg => $where => "$who: SEARCHED: " . $last->{$where}->{url});
+        		
+		return 1;
 	}
+	return 0;
 }
 
 sub whosaid {
