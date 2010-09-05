@@ -87,6 +87,13 @@ sub showtags {
 	return 0;
 }
 
+sub searchtags {
+	my ($robit,$what,$where,$who) = @_;
+	
+	if ($what =~ /^(?:last)?tags/) {
+	}
+}
+
 sub whosaid {
     my ($robit,$what,$where,$who) = @_;
     my $last = $robit->heap->{last};

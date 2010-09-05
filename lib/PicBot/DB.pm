@@ -80,6 +80,14 @@ sub fail {
     $pic->delete if defined $pic;
 }
 
+sub searchtags {
+    my ($self) = @_;
+    my $p = $self->
+    return { id => $p->pid, url => $p->url,
+             said => $p->said, channel => $p->channel,
+             network => $p->network };
+}
+
 sub fetchrand {
     my ($self) = @_;
     my $p = $self->pdb->slice(int rand $self->pdb->count)->first();
