@@ -125,14 +125,29 @@ sub searchtags {
     }
     
     if ($pics && $pics->count()) {
-        my $p = $pics->slice(int rand $pics->count)->first();
+        my $p = $pics->first();
    
     	return { id => $p->pid, url => $p->url,
                  said => $p->said, channel => $p->channel,
-                 network => $p->network };
+                 network => $p->network, search => $pics};
     } else {
     	return undef;
     }
+}
+
+sub getnext {
+    my ($self, $last) = @_;
+	
+	if ($last->{search}) {
+		my $p = $last->{search}->next();
+		if ($p) {
+			return { id => $p->pid, url => $p->url,
+                     said => $p->said, channel => $p->channel,
+                     network => $p->network, search => $last->{search}};
+		} else {
+			return undef;
+		}
+	}
 }
 
 sub fetchrand {
