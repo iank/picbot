@@ -55,16 +55,16 @@ sub addtag {
 		my @tags = split /\s+/, $what;
 		shift @tags; #remove taglast
 		
-		#errors commented out because i don't know how to make DBIx::Class correctly -- simcop2387
 		#addtag returns the tag back when things fail, so that we can do a grep
 		#and join to make some sane output if someone tries to add existing tags
 		my @failed = map {$robit->heap->{db}->addtag($last->{$where}->{id}, $_, $who)} @tags;
-		#my $failedlist = join(", ", (grep {defined $_} @failed));
+		my $failedlist = join(", ", (grep {defined $_} @failed));
 		
-		#if ($failedlist) {
-		#	$robit->irc->yield(privmsg => $where => "$who: existing tags: ".$failedlist);
-		#}
-		$robit->irc->yield(privmsg => $where => "$who: added tags");
+		if ($failedlist) {
+			$robit->irc->yield(privmsg => $where => "$who: existing tags: ".$failedlist);
+		} else {
+			$robit->irc->yield(privmsg => $where => "$who: added tags");
+		}
 		return 1;
 	}
 	return 0;
