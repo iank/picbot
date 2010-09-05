@@ -83,17 +83,10 @@ sub fail {
 
 sub searchtags {
     my ($self, @tags) = @_;
-   
     my $pics = $self->pdb;
     my @lastpids;
     
     for my $tag (@tags) {
-		last if $pics->count()==0; #end if not found
-		
-		my $row = $pics->first();
-        print "COLUMNS: ", join(", ", $row->columns()), "\n";
-        print "SEARCHED: $tag -> ";
-
         my $cond;
         
         if (@lastpids) {
@@ -107,8 +100,6 @@ sub searchtags {
           {
           join => 'tags', # join the tags table
           });
-          
-        print  $pics->count(), "\n";
         
         last if $pics->count()==0; #end if not found
         
