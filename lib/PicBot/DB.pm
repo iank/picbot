@@ -92,7 +92,7 @@ sub searchtags {
         if (@lastpids) {
         	push @$cond, {'tags.tag' => {LIKE => "%$tag%"}, 'tags.pid' => $_ } for @lastpids;
         } else { #first run
-          $cond = {'tags.tag' => {LIKE => "%$tag%"} };
+          $cond = {'tags.tag' => {LIKE => "$tag"} };
         }
         
     	$pics = $self->pdb->search(
