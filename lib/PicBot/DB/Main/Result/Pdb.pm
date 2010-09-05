@@ -5,5 +5,6 @@ __PACKAGE__->table('pdb');
 __PACKAGE__->add_columns(qw/ pid url said channel network fails /);
 __PACKAGE__->add_unique_constraint(['url']);
 __PACKAGE__->set_primary_key('pid');
+__PACKAGE__->has_many("tags", "PicBot::DB::Main::Result::Tags", {"foreign.pid"=>"self.pid"});
 
 1
