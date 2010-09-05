@@ -29,6 +29,11 @@ sub pdb {
     return $self->schema->resultset('Pdb');
 }
 
+sub tags {
+	my ($self) = @_;
+	return $self->schema->resultset('Tags');
+}
+
 sub insert {
     my ($self, $who, $what, $channel, $network) = @_;
 
@@ -39,6 +44,27 @@ sub insert {
         network => $network,
         fails => 0,
     });
+}
+
+sub addtag {
+    my ($self, $pid, $tag, $who) = @_;
+
+    my $row = $self->tags->find_or_create({
+        pid => $pid,
+        who => $who,
+        tag => $tag
+    });
+}
+
+sub gettags {
+    my ($self, $pid) = @_;
+
+    my @rows = $self->tags->search({
+        pid => $pid,
+    },
+    {columns => [qw/tag/]});
+    
+    return map {$_->get_column("tag")} @rows;
 }
 
 sub fail {
