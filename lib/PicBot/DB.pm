@@ -1,6 +1,7 @@
 package PicBot::DB;
 use Moose;
 use PicBot::DB::Main;
+use Data::Dumper;
 
 has 'dsn' => (
     is => 'rw',
@@ -81,21 +82,51 @@ sub fail {
 }
 
 sub searchtags {
-    my ($self, $tag) = @_;
-    my $pics = $self->pdb->search(
-      {
-        'tags.tag' => {LIKE => "%$tag%"},
-      },
-      {
-        join => 'tags', # join the tags table
-      }
-    );
+    my ($self, @tags) = @_;
+   
+    my $pics = $self->pdb;
+    my @lastpids;
     
-    my $p = $pics->slice(int rand $pics->count)->first();
+    for my $tag (@tags) {
+		last if $pics->count()==0; #end if not found
+		
+		my $row = $pics->first();
+        print "COLUMNS: ", join(", ", $row->columns()), "\n";
+        print "SEARCHED: $tag -> ";
+
+        my $cond;
+        
+        if (@lastpids) {
+        	push @$cond, {'tags.tag' => {LIKE => "%$tag%"}, 'tags.pid' => $_ } for @lastpids;
+        } else { #first run
+          $cond = {'tags.tag' => {LIKE => "%$tag%"} };
+        }
+        
+    	$pics = $self->pdb->search(
+    	  $cond,
+          {
+          join => 'tags', # join the tags table
+          });
+          
+        print  $pics->count(), "\n";
+        
+        last if $pics->count()==0; #end if not found
+        
+        @lastpids = (); #clear it out for next iteration
+        for my $row ($pics->all()) {
+        	push @lastpids, $row->pid;
+        }
+    }
     
-    return { id => $p->pid, url => $p->url,
-             said => $p->said, channel => $p->channel,
-             network => $p->network };
+    if ($pics && $pics->count()) {
+        my $p = $pics->slice(int rand $pics->count)->first();
+   
+    	return { id => $p->pid, url => $p->url,
+                 said => $p->said, channel => $p->channel,
+                 network => $p->network };
+    } else {
+    	return undef;
+    }
 }
 
 sub fetchrand {

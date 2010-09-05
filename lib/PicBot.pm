@@ -91,13 +91,22 @@ sub showtags {
 sub searchtags {
 	my ($robit,$what,$where,$who) = @_;
 	
-	if ($what =~ /^search\s+(\S+)/) {
+	if ($what =~ /^search(?:tags?)?\s+(\S+)/) {
+		my @tags = split /\s+/, $what;
+		shift @tags; #remove search
+		
         my $last = $robit->heap->{last};
-        $last->{$where} = $robit->heap->{db}->searchtags($1);
-        # Quit your whining: if there's no data, crashing is like a feature
-        $robit->irc->yield(privmsg => $where => "$who: found " . $last->{$where}->{url});
-        		
-		return 1;
+        my $pic =  $robit->heap->{db}->searchtags(@tags);
+        
+        if ($pic) {
+        	$last->{$where} = $pic;
+        	# Quit your whining: if there's no data, crashing is like a feature
+        	$robit->irc->yield(privmsg => $where => "$who: found " . $last->{$where}->{url});
+        } else {
+        	$robit->irc->yield(privmsg => $where => "$who: not found");
+        }
+        
+        return 1;
 	}
 	return 0;
 }
