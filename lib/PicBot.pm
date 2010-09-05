@@ -95,7 +95,7 @@ sub searchtags {
         my $last = $robit->heap->{last};
         $last->{$where} = $robit->heap->{db}->searchtags($1);
         # Quit your whining: if there's no data, crashing is like a feature
-        $robit->irc->yield(privmsg => $where => "$who: SEARCHED: " . $last->{$where}->{url});
+        $robit->irc->yield(privmsg => $where => "$who: found " . $last->{$where}->{url});
         		
 		return 1;
 	}
