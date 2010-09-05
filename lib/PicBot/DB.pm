@@ -21,7 +21,9 @@ has 'schema' => (
 
 sub _schema {
     my ($self) = @_;
-    return PicBot::DB::Main->connect($self->dsn, $self->user, $self->pass);
+    my $ret = PicBot::DB::Main->connect($self->dsn, $self->user, $self->pass);
+    $ret->deploy(); # make tables if not there
+    return $ret;
 }
 
 sub pdb {

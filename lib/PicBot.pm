@@ -65,7 +65,9 @@ sub addtag {
 		#	$robit->irc->yield(privmsg => $where => "$who: existing tags: ".$failedlist);
 		#}
 		$robit->irc->yield(privmsg => $where => "$who: added tags");
+		return 1;
 	}
+	return 0;
 }
 
 sub showtags {
@@ -80,7 +82,9 @@ sub showtags {
 		} else {
 			$robit->irc->yield(privmsg => $where => "$who: no tags");
 		}
+		return 1;
 	}
+	return 0;
 }
 
 sub whosaid {
