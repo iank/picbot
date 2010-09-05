@@ -51,11 +51,12 @@ sub insert {
 sub addtag {
     my ($self, $pid, $tag, $who) = @_;
 
-    my $row = $self->tags->find_or_create({
+    my $row = $self->tags->create({
         pid => $pid,
         who => $who,
         tag => $tag
     });
+    
 }
 
 sub gettags {
@@ -63,8 +64,7 @@ sub gettags {
 
     my @rows = $self->tags->search({
         pid => $pid,
-    },
-    {columns => [qw/tag/]});
+    });
     
     return map {$_->get_column("tag")} @rows;
 }
