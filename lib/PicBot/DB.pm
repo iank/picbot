@@ -52,14 +52,29 @@ sub insert {
 sub addtag {
     my ($self, $pid, $tag, $who) = @_;
 
-    eval {
-    my $row = $self->tags->create({
-        pid => $pid,
-        who => $who,
-        tag => $tag
-    });
-    };
-    
+    if ($tag =~ /^-(.*)/)
+    {
+    	my $realtag = $1;
+    	eval {
+    		my $row = $self->tags->find({
+    			pid => $pid,
+    			who => $who,
+    			tag => $realtag
+    		});
+    		$row->delete();
+    	};
+    }
+    else
+    {
+    	eval {
+    		my $row = $self->tags->create({
+    			pid => $pid,
+    			who => $who,
+    			tag => $tag
+    		});
+    	};
+    }
+        
     return $tag if $@; #return tag if we failed the constraint
     return; #return nothing for working
 }
