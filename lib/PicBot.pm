@@ -39,6 +39,8 @@ sub spawn {
     $r->add_handler('addressed', \&fail);
 
     $r->add_handler('addressed', \&stats);
+    $r->add_handler('addressed', \&addtag);
+    $r->add_handler('addressed', \&showtags);
     $r->add_handler('addressed', \&whosaid);
     $r->add_handler('addressed', \&vote);
     $r->add_handler('addressed', \&img); # catchall, must be last
@@ -56,7 +58,7 @@ sub addtag {
 		#errors commented out because i don't know how to make DBIx::Class correctly -- simcop2387
 		#addtag returns the tag back when things fail, so that we can do a grep
 		#and join to make some sane output if someone tries to add existing tags
-		my @failed = map {$robit->heap->{db}->pdb->addtag($last->{$where}->{pid}, $_, $who)} @tags;
+		my @failed = map {$robit->heap->{db}->addtag($last->{$where}->{pid}, $_, $who)} @tags;
 		#my $failedlist = join(", ", (grep {defined $_} @failed));
 		
 		#if ($failedlist) {
@@ -71,7 +73,7 @@ sub showtags {
 	my $last = $robit->heap->{last};
 	
 	if ($what =~ /^(?:last)?tags/) {
-		my @tags = $robit->heap->{db}->pdb->gettags($last->{$where}->{pid});
+		my @tags = $robit->heap->{db}->gettags($last->{$where}->{pid});
 		
 		if (@tags) {
 			$robit->irc->yield(privmsg => $where => "$who: " . join(", ", @tags));
