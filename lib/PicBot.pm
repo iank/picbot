@@ -55,6 +55,7 @@ sub addtag {
 		return unless exists $last->{$where};
 		my @tags = split /\s+/, $what;
 		shift @tags; #remove taglast
+        s/,// for @tags;
 		
 		#addtag returns the tag back when things fail, so that we can do a grep
 		#and join to make some sane output if someone tries to add existing tags
