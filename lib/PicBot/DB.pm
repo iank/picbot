@@ -52,14 +52,29 @@ sub insert {
 sub addtag {
     my ($self, $pid, $tag, $who) = @_;
 
-    eval {
-    my $row = $self->tags->create({
-        pid => $pid,
-        who => $who,
-        tag => $tag
-    });
-    };
-    
+    if ($tag =~ /^-(.*)/)
+    {
+    	my $realtag = $1;
+    	eval {
+    		my $row = $self->tags->find({
+    			pid => $pid,
+    			who => $who,
+    			tag => $realtag
+    		});
+    		$row->delete();
+    	};
+    }
+    else
+    {
+    	eval {
+    		my $row = $self->tags->create({
+    			pid => $pid,
+    			who => $who,
+    			tag => $tag
+    		});
+    	};
+    }
+        
     return $tag if $@; #return tag if we failed the constraint
     return; #return nothing for working
 }
@@ -86,7 +101,9 @@ sub searchtags {
     my $pics = $self->pdb;
     my @lastpids;
     
-    for my $tag (@tags) {
+    my $count = 0;
+    
+    while (my $tag = shift @tags) {
         my $cond;
         
         if (@lastpids) {
@@ -100,24 +117,44 @@ sub searchtags {
           {
           join => 'tags', # join the tags table
           });
+        $count = $pics->count();
+        last if $count==0; #end if not found
         
-        last if $pics->count()==0; #end if not found
-        
-        @lastpids = (); #clear it out for next iteration
-        for my $row ($pics->all()) {
-        	push @lastpids, $row->pid;
+        if (@tags) {
+        	@lastpids = (); #clear it out for next iteration
+        	for my $row ($pics->all()) {
+        		push @lastpids, $row->pid;
+        	}
         }
     }
     
-    if ($pics && $pics->count()) {
-        my $p = $pics->slice(int rand $pics->count)->first();
+    if ($pics && $count) {
+        my $p = $pics->first();
    
     	return { id => $p->pid, url => $p->url,
                  said => $p->said, channel => $p->channel,
-                 network => $p->network };
+                 network => $p->network, search => $pics};
     } else {
     	return undef;
     }
+}
+
+sub search {
+}
+
+sub getnext {
+    my ($self, $last) = @_;
+	
+	if ($last->{search}) {
+		my $p = $last->{search}->next();
+		if ($p) {
+			return { id => $p->pid, url => $p->url,
+                     said => $p->said, channel => $p->channel,
+                     network => $p->network, search => $last->{search}};
+		} else {
+			return undef;
+		}
+	}
 }
 
 sub fetchrand {

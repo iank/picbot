@@ -42,6 +42,7 @@ sub spawn {
     $r->add_handler('addressed', \&addtag);
     $r->add_handler('addressed', \&showtags);
     $r->add_handler('addressed', \&searchtags);
+    $r->add_handler('addressed', \&next);
     $r->add_handler('addressed', \&whosaid);
     $r->add_handler('addressed', \&vote);
     $r->add_handler('addressed', \&img); # catchall, must be last
@@ -108,6 +109,23 @@ sub searchtags {
         }
         
         return 1;
+	}
+	return 0;
+}
+
+sub next {
+	my ($robit,$what,$where,$who) = @_;
+	
+	if ($what =~ /^next(?:search|image|img)?/) {
+        my $last = $robit->heap->{last};
+		if ($last->{$where}{search}) {
+			my $next = $robit->heap->{db}->getnext($last->{$where});
+			if ($next) {
+				$last->{$where} = $next;
+				$robit->irc->yield(privmsg => $where => "$who: found " . $last->{$where}->{url});
+				return 1;
+			}
+		}
 	}
 	return 0;
 }
