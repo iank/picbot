@@ -158,7 +158,7 @@ sub whosaid {
 sub stats {
     my ($robit, $what, $where, $who) = @_;
     if ($what =~ /^stats?/) {
-        my $reply = "$who: " . $robit->heap->{db}->pdb->count();
+        my $reply = "$who: " . $robit->heap->{db}->pdb->count() . " pics " . $robit->heap->{db}->tags->count() . " tags";
         $robit->irc->yield(privmsg => $where => $reply);
         return 1;
     }
