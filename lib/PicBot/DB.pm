@@ -98,42 +98,31 @@ sub fail {
 
 sub searchtags {
     my ($self, @tags) = @_;
-    my $pics = $self->pdb;
-    my @lastpids;
+        my $sqlparams;
     
-    my $count = 0;
-    
-    while (my $tag = shift @tags) {
-        my $cond;
-        
-        if (@lastpids) {
-        	push @$cond, {'tags.tag' => {LIKE => "%$tag%"}, 'tags.pid' => $_ } for @lastpids;
-        } else { #first run
-          $cond = {'tags.tag' => {LIKE => "$tag"} };
-        }
-        
-    	$pics = $self->pdb->search(
-    	  $cond,
-          {
-          join => 'tags', # join the tags table
-          });
-        $count = $pics->count();
-        last if $count==0; #end if not found
-        
-        if (@tags) {
-        	@lastpids = (); #clear it out for next iteration
-        	for my $row ($pics->all()) {
-        		push @lastpids, $row->pid;
-        	}
-        }
+    my $suffix = '';
+    my $i = 1;
+    for my $tag (@tags){
+       $sqlparams->{'tag' . $suffix . '.tag'} = {'LIKE' => $tag};
+       $suffix = '_' . ++$i;
     }
+
+   	my $pics = $self->pdb->search(
+   	  $sqlparams,
+      {
+          join => [('tags') x scalar(@tags)], # join the tags table
+      });
     
-    if ($pics && $count) {
+    if ($pics) {
         my $p = $pics->first();
-   
-    	return { id => $p->pid, url => $p->url,
-                 said => $p->said, channel => $p->channel,
-                 network => $p->network, search => $pics};
+        
+        if ($p) {
+    		return { id => $p->pid, url => $p->url,
+            	     said => $p->said, channel => $p->channel,
+                	 network => $p->network, search => $pics};
+        } else {
+        	return undef;
+        }
     } else {
     	return undef;
     }
