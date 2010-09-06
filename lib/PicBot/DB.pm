@@ -101,7 +101,9 @@ sub searchtags {
     my $pics = $self->pdb;
     my @lastpids;
     
-    for my $tag (@tags) {
+    my $count = 0;
+    
+    while (my $tag = shift @tags) {
         my $cond;
         
         if (@lastpids) {
@@ -115,16 +117,18 @@ sub searchtags {
           {
           join => 'tags', # join the tags table
           });
+        $count = $pics->count();
+        last if $count==0; #end if not found
         
-        last if $pics->count()==0; #end if not found
-        
-        @lastpids = (); #clear it out for next iteration
-        for my $row ($pics->all()) {
-        	push @lastpids, $row->pid;
+        if (@tags) {
+        	@lastpids = (); #clear it out for next iteration
+        	for my $row ($pics->all()) {
+        		push @lastpids, $row->pid;
+        	}
         }
     }
     
-    if ($pics && $pics->count()) {
+    if ($pics && $count) {
         my $p = $pics->first();
    
     	return { id => $p->pid, url => $p->url,
@@ -133,6 +137,9 @@ sub searchtags {
     } else {
     	return undef;
     }
+}
+
+sub search {
 }
 
 sub getnext {
