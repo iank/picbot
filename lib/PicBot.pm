@@ -31,6 +31,7 @@ sub spawn {
         },
     );
 
+    $r->add_handler('msg', \&capture_img);
     $r->add_handler('public', \&capture_img);
     $r->add_handler('action', \&capture_img);
     $r->add_handler('addressed', \&capture_img);
@@ -46,6 +47,19 @@ sub spawn {
     $r->add_handler('addressed', \&whosaid);
     $r->add_handler('addressed', \&vote);
     $r->add_handler('addressed', \&img); # catchall, must be last
+
+    $r->add_handler('msg', \&source);
+    $r->add_handler('msg', \&fail);
+    
+    $r->add_handler('msg', \&stats);
+    $r->add_handler('msg', \&addtag);
+    $r->add_handler('msg', \&showtags);
+    $r->add_handler('msg', \&searchtags);
+    $r->add_handler('msg', \&next);
+    $r->add_handler('msg', \&whosaid);
+    $r->add_handler('msg', \&vote);
+    $r->add_handler('msg', \&img); # catchall, must be last
+
     $r->spawn();
 }
 
