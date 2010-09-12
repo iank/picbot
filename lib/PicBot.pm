@@ -31,8 +31,6 @@ sub spawn {
         },
     );
     
-    PicBot::AutoTag::initdb($r->heap()->{db});
-
     $r->add_handler('msg', \&capture_img);
     $r->add_handler('public', \&capture_img);
     $r->add_handler('action', \&capture_img);
@@ -210,7 +208,9 @@ sub capture_img {
         if ($r->is_success) {
             print "$url\n";
             my $pid = $db->insert($who,$url,$where,$robit->server);
-			PicBot::AutoTag::checkurl($who, $url, $pid);
+			my @tags = PicBot::AutoTag::checkurl($robit->heap->{ua}, $url, $pid, $who);
+			
+			my @failed = map {$robit->heap->{db}->addtag($pid, $_, "fukung")} @tags;
 
             my $last = $robit->heap->{last};
             $last->{$where} = $robit->heap->{db}->fetchrand();
