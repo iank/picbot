@@ -7,7 +7,7 @@ use PicBot::DB;
 use PicBot::Twitter;
 use LWP::UserAgent::POE;
 use Data::Dumper;
-
+use PicBot::AutoTag;
 use feature ':5.10';
 
 my $extensions = 'jpe?g|png|p.m|gif|svg|bmp|tiff';
@@ -30,6 +30,8 @@ sub spawn {
             last => {},
         },
     );
+    
+    PicBot::AutoTag::initdb($r->heap()->{db});
 
     $r->add_handler('msg', \&capture_img);
     $r->add_handler('public', \&capture_img);
@@ -207,7 +209,8 @@ sub capture_img {
         my $r = $ua->head($url);
         if ($r->is_success) {
             print "$url\n";
-            $db->insert($who,$url,$where,$robit->server);
+            my $pid = $db->insert($who,$url,$where,$robit->server);
+			PicBot::AutoTag::checkurl($who, $url, $pid);
 
             my $last = $robit->heap->{last};
             $last->{$where} = $robit->heap->{db}->fetchrand();

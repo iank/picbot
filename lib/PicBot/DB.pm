@@ -47,6 +47,7 @@ sub insert {
         network => $network,
         fails => 0,
     });
+    return $row->pid; #return the pid of the new image
 }
 
 sub addtag {
