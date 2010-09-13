@@ -120,7 +120,7 @@ sub searchtags {
         if ($p) {
     		return { id => $p->pid, url => $p->url,
             	     said => $p->said, channel => $p->channel,
-                	 network => $p->network, search => $pics, index=> 1, total=>$pics->count()};
+                	 network => $p->network, search => $pics, "index" => 1, total=>$pics->count()};
         } else {
         	return undef;
         }

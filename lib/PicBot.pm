@@ -117,7 +117,7 @@ sub searchtags {
         if ($pic) {
         	$last->{$where} = $pic;
         	# Quit your whining: if there's no data, crashing is like a feature
-        	$robit->irc->yield(privmsg => $where => "$who: FOUND (".$last->{index}."/".$last->{total}.") " . $last->{$where}->{url});
+        	$robit->irc->yield(privmsg => $where => "$who: FOUND (".$pic->{index}."/".$pic->{total}.") " . $last->{$where}->{url});
         } else {
         	$robit->irc->yield(privmsg => $where => "$who: not found");
         }
@@ -136,7 +136,7 @@ sub next {
 			my $next = $robit->heap->{db}->getnext($last->{$where});
 			if ($next) {
 				$last->{$where} = $next;
-				$robit->irc->yield(privmsg => $where => "$who: FOUND (".$last->{index}."/".$last->{total}.") " . $last->{$where}->{url});
+				$robit->irc->yield(privmsg => $where => "$who: FOUND (".$next->{index}."/".$next->{total}.") " . $last->{$where}->{url});
 				return 1;
 			}
 		}
