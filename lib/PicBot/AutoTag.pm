@@ -41,7 +41,7 @@ sub fukung {
 		my @tags = map {$a = $_->as_text(); $a =~ s/^\s*//; $a =~ s/\s*$//; $a} @taglinks;
 		
 #		print "Got tags: ", join(", ", @tags), "\n";
-		return @tags;
+		return @tags, "fukung";
 	}
 }
 
