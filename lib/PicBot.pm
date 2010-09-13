@@ -208,9 +208,9 @@ sub capture_img {
         if ($r->is_success) {
             print "$url\n";
             my $pid = $db->insert($who,$url,$where,$robit->server);
-			my @tags = PicBot::AutoTag::checkurl($robit->heap->{ua}, $url, $pid, $who);
+			my @tags = PicBot::AutoTag::checkurl($robit->heap->{ua}, $url, $pid);
 			
-			my @failed = map {$robit->heap->{db}->addtag($pid, $_, "fukung")} @tags;
+			my @failed = map {$robit->heap->{db}->addtag($pid, $_, "autotagger")} @tags;
 
             my $last = $robit->heap->{last};
             $last->{$where} = $robit->heap->{db}->fetchrand();
