@@ -12,55 +12,35 @@ use feature ':5.10';
 
 my $extensions = 'jpe?g|png|p.m|gif|svg|bmp|tiff';
 
-sub spawn {
-    my ($nick,$server,@channels) = @_;
-    die "Need nick/server/etc\n" unless @channels;
-    my ($s,$p) = split /:/, $server;
-    $p //= 6667;
-
-    my $r = Robit->new(
-        nick => $nick,
-        server => $s,
-        port => $p,
-        channels => [ @channels ],
-        ignores => [ qr/bot\d*_*$/, 'qq', 'botse', 'Redundant', 'TylerDurden', 'Bit', 'DeepTime', 'Madeline', 'cubert'],
+sub spec {
+    return {
+        nick => 'picbot',
         heap => {
             db => PicBot::DB->new(),
             ua => LWP::UserAgent::POE->new(timeout => 7),
             last => {},
         },
-    );
-    
-    $r->add_handler('msg', \&capture_img);
-    $r->add_handler('public', \&capture_img);
-    $r->add_handler('action', \&capture_img);
-    $r->add_handler('addressed', \&capture_img);
+        ignores => [ qr/bot\d*_*$/, 'qq', 'botse', 'Redundant', 'TylerDurden', 'Bit', 'DeepTime', 'Madeline', 'cubert'],
+        handlers => {
+            msg       => sub { PicBot::capture_img(@_) },
+            public    => sub { PicBot::capture_img(@_) },
+            action    => sub { PicBot::capture_img(@_) },
+            addressed => [
+                sub { PicBot::capture_img(@_) },
+                sub { PicBot::source(@_) },
+                sub { PicBot::fail(@_) },
 
-    $r->add_handler('addressed', \&source);
-    $r->add_handler('addressed', \&fail);
-
-    $r->add_handler('addressed', \&stats);
-    $r->add_handler('addressed', \&addtag);
-    $r->add_handler('addressed', \&showtags);
-    $r->add_handler('addressed', \&searchtags);
-    $r->add_handler('addressed', \&next);
-    $r->add_handler('addressed', \&whosaid);
-    $r->add_handler('addressed', \&vote);
-    $r->add_handler('addressed', \&img); # catchall, must be last
-
-    $r->add_handler('msg', \&source);
-    $r->add_handler('msg', \&fail);
-    
-    $r->add_handler('msg', \&stats);
-    $r->add_handler('msg', \&addtag);
-    $r->add_handler('msg', \&showtags);
-    $r->add_handler('msg', \&searchtags);
-    $r->add_handler('msg', \&next);
-    $r->add_handler('msg', \&whosaid);
-    $r->add_handler('msg', \&vote);
-    $r->add_handler('msg', \&img); # catchall, must be last
-
-    $r->spawn();
+                sub { PicBot::stats(@_) },
+                sub { PicBot::addtag(@_) },
+                sub { PicBot::showtags(@_) },
+                sub { PicBot::searchtags(@_) },
+                sub { PicBot::next(@_) },
+                sub { PicBot::whosaid(@_) },
+                sub { PicBot::vote(@_) },
+                sub { PicBot::img(@_) },
+            ],
+        },
+    };
 }
 
 sub addtag {
@@ -158,7 +138,7 @@ sub whosaid {
 sub stats {
     my ($robit, $what, $where, $who) = @_;
     if ($what =~ /^stats?/) {
-        my $reply = "$who: " . $robit->heap->{db}->pdb->count() . " pics " . $robit->heap->{db}->tags->count() . " tags";
+        my $reply = "$who: " . $robit->heap->{db}->pdb->count() . " pics " . $robit->heap->{db}->tags->count() . " tags.";
         $robit->irc->yield(privmsg => $where => $reply);
         return 1;
     }
