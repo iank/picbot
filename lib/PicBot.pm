@@ -133,7 +133,7 @@ sub next {
 sub whosaid {
     my ($robit,$args) = @_;
     my $last = $robit->heap->{last};
-    if ($args->{what} =~ /^whosaid/) {
+    if ($args->{what} =~ /^(whosaid|sauce)/) {
         return unless exists $last->{$args->{where}};
         $robit->cb->reply($args->{where} => $args->{who}.': ' . $last->{$args->{where}}->{said}
             . ' in ' . $last->{$args->{where}}->{channel} . ' on ' . $last->{$args->{where}}->{network});
