@@ -147,7 +147,7 @@ sub next {
 sub whosaid {
     my ($robit,$what,$where,$who) = @_;
     my $last = $robit->heap->{last};
-    if ($what =~ /^whosaid/) {
+    if ($what =~ /^(whosaid|sauce)/) {
         return unless exists $last->{$where};
         $robit->irc->yield(privmsg => $where => "$who: " . $last->{$where}->{said}
             . ' in ' . $last->{$where}->{channel} . ' on ' . $last->{$where}->{network});
