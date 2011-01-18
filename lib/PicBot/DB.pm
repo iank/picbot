@@ -104,7 +104,7 @@ sub searchtags {
     my $suffix = '';
     my $i = 1;
     for my $tag (@tags){
-       $sqlparams->{'tags' . $suffix . '.tag'} = $tag;
+       $sqlparams->{'tags' . $suffix . '.tag'} = {LIKE => $tag};
        $suffix = '_' . ++$i;
     }
 
