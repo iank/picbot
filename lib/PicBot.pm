@@ -173,7 +173,7 @@ sub source {
 sub fail {
     my ($robit,$args) = @_;
     my $last = $robit->heap->{last};
-    if ($args->{what} =~ /sage|404/) {
+    if ($args->{what} =~ /^sage\b|^404\b/) {
         if (exists $last->{$args->{where}}) {
             $robit->heap->{db}->fail($last->{$args->{where}}->{id});
             delete $last->{$args->{where}};
