@@ -188,7 +188,7 @@ sub capture_img {
     my $db = $robit->heap->{db};
     my $ua = $robit->heap->{ua};
 
-    if ($args->{what} =~ m!(http://\S+\.(?:$extensions))(?:\s|$)!i) {
+    if ($args->{what} =~ m!(https?://\S+\.(?:$extensions))(?:\s|$)!i) {
         my $url = $1;
         my $r = $ua->head($url);
         if ($r->is_success) {
