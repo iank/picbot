@@ -14,7 +14,7 @@ my $ircname  = 'picbot';
 my $server   = 'irc.freenode.org';
  
 my @channels = (qw/##turtles #peltkore #ncsulug ##church-of-picbot/);
-my $extensions = 'jpe?g|png|p.m|gif|svg|bmp|tiff';
+my $extensions = 'jpe?g|.ng|p.m|gif|svg|bmp|tiff';
  
 # We create a new PoCo-IRC object
 my $irc = POE::Component::IRC->spawn(
