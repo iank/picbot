@@ -14,7 +14,7 @@ my $ircname  = 'picbot';
 my $server   = 'irc.freenode.org';
  
 my @channels = (qw/##turtles #peltkore #ncsulug ##church-of-picbot/);
-my $extensions = 'jpe?g|png|p.m|gif|svg|bmp|tiff';
+my $extensions = 'jpe?g|.ng|p.m|gif|svg|bmp|tiff';
  
 # We create a new PoCo-IRC object
 my $irc = POE::Component::IRC->spawn(
@@ -71,7 +71,7 @@ sub irc_public {
         my $url = $1;
         return unless $ua->head($url)->is_success;
         $r->set($url => 1);
-        $reply = "k. $reply";
+        $reply = "$who: k. $reply";
     } elsif ($what =~ /^$nickname[,:]\s+(sage|404)\b/) {
         return unless defined $last->{$where};
         $r->del($last->{$where});
