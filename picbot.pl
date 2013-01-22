@@ -71,11 +71,11 @@ sub irc_public {
         my $url = $1;
         return unless $ua->head($url)->is_success;
         $r->set($url => 1);
-        $reply = "$nick: k. $reply";
+        $reply = "$nick: thanks buddy. here's another: $reply";
     } elsif ($what =~ /^$nickname[,:]\s+(sage|404)\b/) {
         return unless defined $last->{$where};
         $r->del($last->{$where});
-        $reply = "10-4. $reply";
+        $reply = "bahleeted.";
     } elsif ($what =~ /^$nickname[,:]/) {
     } else { return; }
 
