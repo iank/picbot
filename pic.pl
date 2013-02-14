@@ -16,6 +16,13 @@ my $n = $v->{n} // 1;
 $n = min($n, 100);
 my @l;
 
+if (exists $v->{404} && $v->{404} && exists $v->{url} ) { // /pic?404=yes&url=foo is present
+    $r->del($v->{url}); // delete it
+
+    print $q->header(),"deleted";
+}
+
+
 if (exists $v->{type}) {
     my @hack = $r->keys("*." . $v->{type});
     push @l, $hack[int rand @hack] for 1..$n;
