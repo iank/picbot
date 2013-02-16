@@ -16,14 +16,21 @@ my $n = $v->{n} // 1;
 $n = min($n, 100);
 my @l;
 
-# /pic?404=yes&url=foo
-if (exists $v->{404} && $v->{404} && exists $v->{url} ) {
-    $r->del($v->{url});
-
-    print $q->header(),"deleted";
+sub bail {
+    print "Content-type: application/json\n\n";
+    print to_json($_[0]);
     exit;
 }
 
+# /pic?404=yes&url=foo
+if (exists $v->{404} && $v->{404} && exists $v->{url} ) {
+    my $deleted = $r->del($v->{url});
+    bail({deleted => $deleted});
+} elsif ( exists $v->{404} && $v->{404} && !( exists $v->{url}) ) {
+    bail({deleted => 0, error => "no url"});
+} elsif ( exists $v->{404} && !($v->{404}) ) {
+    bail({deleted => 0, error => "wat"});
+}
 
 if (exists $v->{type}) {
     my @hack = $r->keys("*." . $v->{type});
@@ -33,13 +40,12 @@ if (exists $v->{type}) {
 }
 
 if (exists $v->{redir} && $v->{redir}) {
-    print $q->redirect(@l[0]);
+    print $q->redirect($l[0]);
     exit;
 }
 
-print "Content-type: application/json\n\n";
 if (@l == 1) {
-    print to_json({pic => @l});
+    bail({pic => @l});
 } else {
-    print to_json({pics => \@l});
+    bail({pics => \@l});
 }
