@@ -19,9 +19,12 @@ my @l;
 if (exists $v->{404} && $v->{404} && exists $v->{url} ) { // /pic?404=yes&url=foo is present
     $r->del($v->{url}); // delete it
 
-    print $q->header(),"deleted";
+    print to_json({deleted = 1});
+} else if ( exists $v->{404} && $v->{404} && !( exists $v->{url}) ) {
+    print to_json({deleted = 0, error = "no url"});
+} else if ( exists $v->{404} && !($v->{404}) ) {
+    print to_json({deleted = 0, error = "wat"});
 }
-
 
 if (exists $v->{type}) {
     my @hack = $r->keys("*." . $v->{type});
