@@ -71,7 +71,11 @@ sub irc_public {
     my $reply;
     until (defined $reply) {
         my $url = $last->{$where} = $r->randomkey;
-        $reply = $url if $ua->head($url)->is_success;
+        if ($ua->head($url)->is_success) {
+            $reply = $url;
+        } else {
+            $r->del($url);
+        }
     }
     if ($what =~ m!(https?://\S+\.(?:$extensions))(?:\s|$)!i) {
         my $url = $1;
