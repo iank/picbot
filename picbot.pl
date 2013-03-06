@@ -66,7 +66,13 @@ sub irc_public {
     my $channel = $where->[0];
 
     my $r = Redis->new(reconnect => 60);
-    my $reply = $last->{$where} = $r->randomkey;
+
+    # Get random URL
+    my $reply;
+    until (defined $reply) {
+        my $url = $last->{$where} = $r->randomkey;
+        $reply = $url if $ua->head($url)->is_success;
+    }
     if ($what =~ m!(https?://\S+\.(?:$extensions))(?:\s|$)!i) {
         my $url = $1;
         return unless $ua->head($url)->is_success;
